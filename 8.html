@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Générateur de noms d'entreprise</title>
+  <style>
+    body {
+      background: #1e1e2f;
+      color: #eee;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      padding: 40px 20px;
+      direction: ltr;
+    }
+    h1 {
+      margin-bottom: 10px;
+      color: #ff6f61;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 60%;
+      font-size: 1.1em;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      margin-bottom: 20px;
+    }
+    button {
+      background: #ff6f61;
+      border: none;
+      color: white;
+      padding: 12px 25px;
+      font-size: 1em;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #ff4c3b;
+    }
+    .result {
+      margin-top: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+    }
+    .name-card {
+      background: #292946;
+      padding: 15px 25px;
+      border-radius: 10px;
+      width: 250px;
+      box-shadow: 0 0 10px #ff6f61aa;
+      transition: transform 0.2s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+    .name-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #ff6f61ff;
+    }
+    .domain-check {
+      margin-top: 10px;
+      font-size: 0.9em;
+      color: #aaa;
+    }
+    .available {
+      color: #4caf50;
+      font-weight: bold;
+    }
+    .unavailable {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Générateur de noms d'entreprise</h1>
+  <p>Entrez un mot-clé pour générer des noms innovants avec vérification de la disponibilité du domaine</p>
+
+  <input type="text" id="keyword" placeholder="Entrez un mot-clé..." />
+  <button id="generateBtn">Rechercher des noms</button>
+
+  <div class="result" id="results"></div>
+
+  <script>
+    const generateBtn = document.getElementById('generateBtn');
+    const resultsDiv = document.getElementById('results');
+
+    const suffixes = ['Tech', 'Plus', 'Style', 'Pro', 'Line', 'Fox', 'Zone', 'Works', 'Hub', 'Net'];
+
+    function generateNames(keyword) {
+      const names = [];
+      const cleanKeyword = keyword.trim();
+
+      suffixes.forEach(suf => {
+        names.push(cleanKeyword + suf);
+        names.push(suf + cleanKeyword);
+      });
+
+      return names;
+    }
+
+    function checkDomainAvailability(name) {
+      return Math.random() > 0.3; // 70% chance domain is available
+    }
+
+    function displayNames(names) {
+      resultsDiv.innerHTML = '';
+
+      if (names.length === 0) {
+        resultsDiv.innerHTML = '<p>Aucun mot-clé saisi.</p>';
+        return;
+      }
+
+      names.forEach(name => {
+        const card = document.createElement('div');
+        card.classList.add('name-card');
+
+        card.innerHTML = `<strong>${name}.com</strong><div class="domain-check">Vérification de la disponibilité du domaine...</div>`;
+        
+        setTimeout(() => {
+          const available = checkDomainAvailability(name);
+          const checkDiv = card.querySelector('.domain-check');
+          if (available) {
+            checkDiv.textContent = 'Domaine disponible ?';
+            checkDiv.classList.add('available');
+          } else {
+            checkDiv.textContent = 'Domaine non disponible ?';
+            checkDiv.classList.add('unavailable');
+          }
+        }, 1000);
+
+        card.addEventListener('click', () => {
+          navigator.clipboard.writeText(name + '.com').then(() => {
+            alert('Nom copié : ' + name + '.com');
+          });
+        });
+
+        resultsDiv.appendChild(card);
+      });
+    }
+
+    generateBtn.addEventListener('click', () => {
+      const keyword = document.getElementById('keyword').value;
+      if (!keyword.trim()) {
+        alert('Veuillez saisir un mot-clé');
+        return;
+      }
+      const generatedNames = generateNames(keyword);
+      displayNames(generatedNames);
+    });
+
+    document.getElementById('keyword').addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') {
+        generateBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>
